@@ -13,21 +13,39 @@ function App() {
     unconfirmed: 0,
     total: 0,
   });
+  const [inscription, setInscription]=useState({
+    total:0,
+    inscriptionId:"",
+    inscriptionNumber:"",
+    address:"",
+    outputValue:"",
+    content:"",
+    contentLength:"",
+    contentType:0,
+    preview:0,
+    timestamp:0,
+    offset:0,
+    genesisTransaction:"",
+    location:"",
+  })
   const [network, setNetwork] = useState("livenet");
 
   const getBasicInfo = async () => {
     const unisat = (window as any).unisat;
-    const [address] = await unisat.getAccounts();
+    const [address] = await unisat.getAccounts();//string: to retrieve address of current account
     setAddress(address);
 
-    const publicKey = await unisat.getPublicKey();
+    const publicKey = await unisat.getPublicKey();//get publickey of current account
     setPublicKey(publicKey);
 
-    const balance = await unisat.getBalance();
+    const balance = await unisat.getBalance();// Object: confirmed, unconfirmed, total
     setBalance(balance);
 
-    const network = await unisat.getNetwork();
+    const network = await unisat.getNetwork();//String: the livenet and testnet
     setNetwork(network);
+
+    const inscription= await unisat.getInscriptions(0,10);//object
+    setInscription(inscription);
   };
 
   const selfRef = useRef<{ accounts: string[] }>({
@@ -48,6 +66,8 @@ function App() {
       setAddress(_accounts[0]);
 
       getBasicInfo();
+      console.log(inscription);
+      
     } else {
       setConnected(false);
     }
@@ -57,6 +77,8 @@ function App() {
   const handleNetworkChanged = (network: string) => {
     setNetwork(network);
     getBasicInfo();
+    console.log(inscription);
+    
   };
  const disconnectWallet=()=>{
     setConnected(false)
@@ -180,7 +202,7 @@ function App() {
           <div>
             <Button
               onClick={async () => {
-                const result = await unisat.requestAccounts();
+                const result = await unisat.requestAccounts();//retuns string[]:adress of current account to get permission from user
                 handleAccountsChanged(result);
                 setConnected(true);
                 
@@ -337,7 +359,7 @@ function PushPsbtCard() {
 
 function SendBitcoin() {
   const [toAddress, setToAddress] = useState(
-    "tb1qmfla5j7cpdvmswtruldgvjvk87yrflrfsf6hh0"
+    ""
   );
   const [satoshis, setSatoshis] = useState(1000);
   const [txid, setTxid] = useState("");
