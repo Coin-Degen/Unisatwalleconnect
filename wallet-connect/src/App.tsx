@@ -13,20 +13,22 @@ function App() {
     unconfirmed: 0,
     total: 0,
   });
-  const [inscription, setInscription]=useState({
-    total:0,
-    inscriptionId:"",
-    inscriptionNumber:"",
-    address:"",
-    outputValue:"",
-    content:"",
-    contentLength:"",
-    contentType:0,
-    preview:0,
-    timestamp:0,
-    offset:0,
-    genesisTransaction:"",
-    location:"",
+  const [inscription, setInscription] = useState({
+    total: 0,
+    list: {
+      inscriptionId: "",
+      inscriptionNumber: "",
+      address: "",
+      outputValue: "",
+      content: "",
+      contentLength: "",
+      contentType: 0,
+      preview: 0,
+      timestamp: 0,
+      offset: 0,
+      genesisTransaction: "",
+      location: "",
+    }
   })
   const [network, setNetwork] = useState("livenet");
 
@@ -44,7 +46,7 @@ function App() {
     const network = await unisat.getNetwork();//String: the livenet and testnet
     setNetwork(network);
 
-    const inscription= await unisat.getInscriptions(0,10);//object
+    const inscription = await unisat.getInscriptions(0, 10);//object
     setInscription(inscription);
   };
 
@@ -53,7 +55,7 @@ function App() {
   });
   const self = selfRef.current;
   const handleAccountsChanged = (_accounts: string[]) => {
-   
+
     if (self.accounts[0] === _accounts[0]) {
       // prevent from triggering twice
       return;
@@ -67,48 +69,47 @@ function App() {
 
       getBasicInfo();
       console.log(inscription);
-      
+
     } else {
       setConnected(false);
     }
-  
+
   };
 
   const handleNetworkChanged = (network: string) => {
     setNetwork(network);
     getBasicInfo();
     console.log(inscription);
-    
+
   };
- const disconnectWallet=()=>{
+  const disconnectWallet = () => {
     setConnected(false)
- }
-  
+  }
+
   useEffect(() => {
 
     async function checkUnisat() {
       let unisat = (window as any).unisat;
       for (let i = 1; i < 10 && !unisat; i += 1) {
-          await new Promise((resolve) => setTimeout(resolve, 100*i));
-          unisat = (window as any).unisat;
+        await new Promise((resolve) => setTimeout(resolve, 100 * i));
+        unisat = (window as any).unisat;
       }
 
-      if(unisat){
-          setUnisatInstalled(true);
-      }else if (!unisat)
-          return;
+      if (unisat) {
+        setUnisatInstalled(true);
+      } else if (!unisat)
+        return;
 
-      if(connected){
-      unisat.getAccounts().then((accounts: string[]) => {
+      if (connected) {
+        unisat.getAccounts().then((accounts: string[]) => {
           handleAccountsChanged(accounts);
-      });
+        });
 
-      unisat.on("accountsChanged", handleAccountsChanged);
-      unisat.on("networkChanged", handleNetworkChanged);
-    }else
-      {
-          unisat.removeListener("accountsChanged", handleAccountsChanged);
-          unisat.removeListener("networkChanged", handleNetworkChanged);
+        unisat.on("accountsChanged", handleAccountsChanged);
+        unisat.on("networkChanged", handleNetworkChanged);
+      } else {
+        unisat.removeListener("accountsChanged", handleAccountsChanged);
+        unisat.removeListener("networkChanged", handleNetworkChanged);
       };
     }
 
@@ -147,7 +148,7 @@ function App() {
             }}
           >
             <Button
-            onClick={disconnectWallet}>
+              onClick={disconnectWallet}>
               Disconnect Unisat wallet
             </Button>
             <Card
@@ -205,7 +206,7 @@ function App() {
                 const result = await unisat.requestAccounts();//retuns string[]:adress of current account to get permission from user
                 handleAccountsChanged(result);
                 setConnected(true);
-                
+
               }}
             >
               Connect Unisat Wallet
